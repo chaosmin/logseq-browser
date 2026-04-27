@@ -45,9 +45,9 @@ function createApp(rootDir) {
 
   app.get('/api/index', (_, res) => res.json(getIndex()));
 
-  app.get('/api/tree', (_, res) => res.json(buildTree(rootDir)));
+  app.get('/api/tree', (_, res) => res.json(buildTree(resolvedRoot)));
 
-  app.get('/api/file', (req, res) => {
+  app.get('/api/file', async (req, res) => {
     const filePath = req.query.path;
     if (!filePath) return res.status(400).json({ error: 'Missing path parameter' });
 
@@ -58,13 +58,15 @@ function createApp(rootDir) {
     if (!resolved.endsWith('.md')) {
       return res.status(400).json({ error: 'Only .md files are supported' });
     }
-    if (!fs.existsSync(resolved)) {
-      return res.status(404).json({ error: 'File not found' });
-    }
 
-    const raw = fs.readFileSync(resolved, 'utf8');
-    const { propsHtml, transformed } = preprocess(raw);
-    res.json({ html: propsHtml + marked.parse(transformed) });
+    try {
+      const raw = await fs.promises.readFile(resolved, 'utf8');
+      const { propsHtml, transformed } = preprocess(raw);
+      res.json({ html: propsHtml + marked.parse(transformed) });
+    } catch (err) {
+      if (err.code === 'ENOENT') return res.status(404).json({ error: 'File not found' });
+      res.status(500).json({ error: 'Internal error' });
+    }
   });
 
   return app;
