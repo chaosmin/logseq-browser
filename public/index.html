@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Markdown Browser</title>
+  <link rel="stylesheet" href="/lib/github-markdown.css">
+  <link rel="stylesheet" href="/lib/highlight.css">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header id="topbar">
+    <div id="logo">📚 Markdown Browser</div>
+    <input type="text" id="search-input" placeholder="模糊搜索..." autocomplete="off" spellcheck="false">
+  </header>
+  <div id="main">
+    <nav id="sidebar">
+      <div id="file-tree"></div>
+    </nav>
+    <main id="content">
+      <div id="content-body" class="markdown-body">
+        <p class="placeholder">← 从左侧选择一个文件</p>
+      </div>
+    </main>
+  </div>
+  <script src="/lib/fuse.min.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
