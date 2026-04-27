@@ -25,7 +25,7 @@ function createApp(rootDir) {
   app.use(express.static(path.join(__dirname, 'public')));
 
   app.get('/lib/fuse.min.js', (_, res) =>
-    res.sendFile(path.join(__dirname, 'node_modules/fuse.js/dist/fuse.min.js'))
+    res.sendFile(path.join(__dirname, 'node_modules/fuse.js/dist/fuse.min.mjs'))
   );
   app.get('/lib/highlight.css', (_, res) =>
     res.sendFile(path.join(__dirname, 'node_modules/highlight.js/styles/github.css'))
@@ -61,11 +61,13 @@ function createApp(rootDir) {
 
     try {
       const raw = await fs.promises.readFile(resolved, 'utf8');
-      const { propsHtml, transformed } = preprocess(raw);
-      res.json({ html: propsHtml + marked.parse(transformed) });
+      const { transformed } = preprocess(raw);
+      res.json({ html: marked.parse(transformed) });
     } catch (err) {
       if (err.code === 'ENOENT') return res.status(404).json({ error: 'File not found' });
-      res.status(500).json({ error: 'Internal error' });
+      console.error(`[500] ${resolved}`);
+      console.error(err);
+      res.status(500).json({ error: 'Internal error', message: err.message });
     }
   });
 
@@ -93,7 +95,7 @@ if (require.main === module) {
 
   const app = createApp(rootDir);
   app.listen(port, () => {
-    console.log(`Markdown Browser running at http://localhost:${port}`);
+    console.log(`Logseq Browser running at http://localhost:${port}`);
   });
 }
 

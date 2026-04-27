@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Markdown Browser</title>
+  <title>Logseq Browser</title>
   <link rel="stylesheet" href="/lib/github-markdown.css">
   <link rel="stylesheet" href="/lib/highlight.css">
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
   <header id="topbar">
-    <div id="logo">📚 Markdown Browser</div>
+    <div id="logo">📚 Logseq Browser</div>
     <input type="text" id="search-input" placeholder="模糊搜索..." autocomplete="off" spellcheck="false">
   </header>
   <div id="main">
@@ -23,7 +23,7 @@
       </div>
     </main>
   </div>
-  <script src="/lib/fuse.min.js"></script>
-  <script src="/app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <script type="module" src="/app.js"></script>
 </body>
 </html>
