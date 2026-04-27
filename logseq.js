@@ -13,10 +13,10 @@ function extractProperties(text) {
 
 function convertWikiLinks(text) {
   text = text.replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, (_, page, alias) =>
-    `<a href="#/pages/${encodeURIComponent(page)}.md" class="wiki-link">${alias}</a>`
+    `<a href="#/pages/${encodeURIComponent(page)}.md" class="wiki-link">${escapeHtml(alias)}</a>`
   );
   text = text.replace(/\[\[([^\]]+)\]\]/g, (_, page) =>
-    `<a href="#/pages/${encodeURIComponent(page)}.md" class="wiki-link">${page}</a>`
+    `<a href="#/pages/${encodeURIComponent(page)}.md" class="wiki-link">${escapeHtml(page)}</a>`
   );
   return text;
 }
@@ -30,11 +30,11 @@ function convertBlockRefs(text) {
 
 function convertUnsupportedBlocks(text) {
   text = text.replace(
-    /\{\{embed \(\([^)]+\)\)\}\}/g,
+    /\{\{embed \(\([^)\n]{0,200}\)\)\}\}/g,
     '<div class="unsupported-block">[Embedded block — not supported]</div>'
   );
   text = text.replace(
-    /\{\{query[^}]*\}\}/g,
+    /\{\{query[^}\n]{0,500}\}\}/g,
     '<div class="unsupported-block">[Dynamic query — not supported]</div>'
   );
   return text;
@@ -47,10 +47,18 @@ function convertTags(text) {
   );
 }
 
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 function renderPropertiesTable(properties) {
   if (Object.keys(properties).length === 0) return '';
   const rows = Object.entries(properties)
-    .map(([k, v]) => `<tr><td class="prop-key">${k}</td><td class="prop-value">${v}</td></tr>`)
+    .map(([k, v]) => `<tr><td class="prop-key">${escapeHtml(k)}</td><td class="prop-value">${escapeHtml(v)}</td></tr>`)
     .join('');
   return `<table class="logseq-properties">${rows}</table>`;
 }
@@ -62,7 +70,7 @@ function filenameToTitle(filename) {
 function toPlainText(text) {
   text = text.replace(/^[a-z][a-z0-9_-]*::.*$/gm, '');
   text = text.replace(/\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g, '$1');
-  text = text.replace(/\(\([0-9a-f-]{36}\)\)/g, '');
+  text = text.replace(/\(\([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\)\)/g, '');
   text = text.replace(/\{\{[^}]*\}\}/g, '');
   text = text.replace(/^#{1,6}\s+/gm, '');
   text = text.replace(/\*{1,3}([^*\n]+)\*{1,3}/g, '$1');
