@@ -54,6 +54,8 @@ function scanDir(dir, type) {
 }
 
 function updateFile(filePath) {
+  const rel = path.relative(rootDir, filePath);
+  if (!rel || rel.startsWith('..') || path.isAbsolute(rel)) return;
   const type = filePath.replace(/\\/g, '/').includes('/journals/') ? 'journal' : 'page';
   try {
     const content = fs.readFileSync(filePath, 'utf8');
@@ -71,6 +73,7 @@ function updateFile(filePath) {
 
 function removeFile(filePath) {
   const relativePath = path.relative(rootDir, filePath);
+  if (!relativePath || relativePath.startsWith('..') || path.isAbsolute(relativePath)) return;
   index = index.filter(e => e.path !== relativePath);
 }
 
@@ -80,7 +83,7 @@ function listMdFiles(dir, root, type) {
   const results = [];
   if (!fs.existsSync(dir)) return results;
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (entry.name.startsWith('.')) continue;
+    if (entry.name.startsWith('.') || entry.name === 'node_modules') continue;
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       results.push(...listMdFiles(fullPath, root, type));
